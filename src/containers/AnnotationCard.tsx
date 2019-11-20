@@ -1,24 +1,18 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import "./styles/AnnotationCard.css";
 
 interface PassedProps {
   title: string;
   notes: Array<string>;
-  closeAnnotationCard: (notes: Array<string>) => void;
+  updateNotes: (note: string) => void;
+  closeAnnotationCard: () => void;
 }
 
 const AnnotationCard: React.FC<PassedProps> = props => {
-  const [notes, setUpdatedNotes] = useState<Array<string>>([]);
   const [textAreaValue, setTextAreaValue] = useState<string>("");
 
-  useEffect(() => {
-    const { notes } = props;
-    if (notes.length > 0) {
-      setUpdatedNotes(notes);
-    }
-  }, []);
-
   const createNoteList = () => {
+    const { notes } = props;
     return notes.map((note, index) => {
       return (
         <li style={{ fontSize: ".75rem" }} key={index}>
@@ -36,14 +30,13 @@ const AnnotationCard: React.FC<PassedProps> = props => {
   };
   const handleCloseAnnotationCard = () => {
     const { closeAnnotationCard } = props;
-    closeAnnotationCard(notes);
+    closeAnnotationCard();
   };
 
   const handleSubmit = (evt: any) => {
     evt.preventDefault();
-    const updatedNotes = [...notes];
-    updatedNotes.push(textAreaValue);
-    setUpdatedNotes(updatedNotes);
+    const { updateNotes } = props;
+    updateNotes(textAreaValue);
     clearTextArea();
   };
 
@@ -61,7 +54,7 @@ const AnnotationCard: React.FC<PassedProps> = props => {
       <div className="annotation-card-info">
         <div className="annotation-card-data-title">Notes:</div>
         <div className="annotation-card-data">
-          <ul>{notes.length > 0 ? createNoteList() : null}</ul>
+          <ul>{createNoteList()}</ul>
         </div>
         <textarea
           className="annotation-card-input"

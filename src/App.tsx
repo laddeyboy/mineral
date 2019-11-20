@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import ReactMapboxGL from "react-mapbox-gl";
 import DrawControl from "react-mapbox-gl-draw";
 import "@mapbox/mapbox-gl-draw/dist/mapbox-gl-draw.css";
-import { GeoJSON, Feature } from "geojson";
+import { Feature } from "geojson";
 
 import { mbToken } from "./util/constants";
 import AnnotationCard from "./containers/AnnotationCard";
@@ -10,80 +10,103 @@ import { deepCopy } from "./util/helpers";
 
 const Map = ReactMapboxGL({ accessToken: mbToken });
 
-const App: React.FC = () => {
-  const [featuresArray, setFeatures] = useState<Array<Feature>>([]);
-  const [activeFeatureID, setActiveFeatureID] = useState<string>("");
-  const [showCard, toggleShowCard] = useState<boolean>(false);
-  const [cardNotes, setCardNotes] = useState<Array<string>>([]);
-  const [cardTitle, setCardTitle] = useState<string>("");
+interface StateProps {
+  showCard: boolean;
+  cardNotes: Array<string>;
+  featuresArray: Array<any>;
+  activeFeatureID: string;
+}
 
-  useEffect(() => {
-    console.log("featuresArray effect", featuresArray);
-  }, [featuresArray]);
+class App extends React.Component<{}, StateProps> {
+  constructor(props: any) {
+    super(props);
+    this.state = {
+      showCard: false,
+      cardNotes: [],
+      featuresArray: [],
+      activeFeatureID: ""
+    };
+  }
 
-  const onDrawCreate = ({ features }: any) => {
-    const { id } = features[0];
-    const [newFeature] = features;
-    newFeature.properties["nickName"] = `Feature ${id.slice(-4)}`;
-    newFeature.properties["notes"] = [];
-    const temp = deepCopy(featuresArray);
-    console.log("TEMP", temp);
-    setFeatures(featuresArray => [...featuresArray, newFeature]);
-    setActiveFeatureID(id);
-    toggleShowCard(true);
+  addCustomPropertiesToFeature = (feat: Feature): Feature => {
+    const newFeature = { ...feat };
+    if (newFeature.properties) {
+      newFeature.properties["nickName"] = `Feature`;
+      newFeature.properties["notes"] = [];
+    }
+    return newFeature;
   };
 
-  const onDrawSelectionChange = ({ features }: any) => {
-    toggleShowCard(true);
+  onDrawCreate = ({ features }: any) => {
+    const newFeature = this.addCustomPropertiesToFeature(features[0]);
+    console.log(newFeature, newFeature.id);
+    const newFeaturesArray = deepCopy(this.state.featuresArray);
+    newFeaturesArray.push(newFeature);
+    this.setState({ featuresArray: newFeaturesArray });
+    this.setState({ activeFeatureID: newFeature.id as string });
+    this.setState({ showCard: true });
+  };
+
+  getFeatureNotesByID = (id: string) => {
+    const { featuresArray } = this.state;
+    return featuresArray
+      .filter(item => item.id === id)
+      .map(feat => feat.properties && feat.properties.notes)[0];
+  };
+
+  onDrawSelectionChange = ({ features }: any) => {
+    this.setState({ showCard: true });
     if (features.length > 0) {
       const { id } = features[0];
-      setCardTitle(id);
+      this.setState({ activeFeatureID: id });
     }
   };
 
-  const handleCloseAnnotationCard = (notes: Array<string>) => {
-    //find id in featuresArray
-    const featureArrayCopy = [...featuresArray];
-    featuresArray.map(feat => {
-      console.log("active id", activeFeatureID);
+  updateNotes = (note: string) => {
+    const { featuresArray, activeFeatureID } = this.state;
+    const updatedFeatures = deepCopy(featuresArray);
+    updatedFeatures.map(feat => {
       if (feat.properties && feat.id === activeFeatureID) {
-        feat.properties.notes = notes;
+        feat.properties.notes.push(note);
       }
     });
-    console.log(featureArrayCopy);
-    setFeatures(featureArrayCopy);
-    setCardNotes(notes);
-    toggleShowCard(false);
+    this.setState({ featuresArray: updatedFeatures });
   };
 
-  return (
-    <div>
-      {showCard ? (
-        <AnnotationCard
-          title={"something meaningful"}
-          notes={cardNotes} //notes is now an array of objects???
-          closeAnnotationCard={handleCloseAnnotationCard}
-        />
-      ) : null}
-      <Map
-        style="mapbox://styles/mapbox/streets-v10"
-        containerStyle={{
-          height: "100vh",
-          width: "100vw"
-        }}
-        zoom={[11]}
-        center={[-95.3884096, 29.7640512]}
-        //onStyleLoad={testingOnClick} //allows me to get the map Context
-      >
-        <DrawControl
-          displayControlsDefault={false}
-          controls={{ polygon: true, trash: true }}
-          onDrawCreate={onDrawCreate}
-          onDrawSelectionChange={onDrawSelectionChange}
-        />
-      </Map>
-    </div>
-  );
-};
+  handleCloseAnnotationCard = () => {
+    this.setState({ showCard: false });
+  };
 
+  render() {
+    const { showCard, activeFeatureID } = this.state;
+    return (
+      <div>
+        {showCard ? (
+          <AnnotationCard
+            title={"Title"}
+            notes={this.getFeatureNotesByID(activeFeatureID)}
+            updateNotes={this.updateNotes}
+            closeAnnotationCard={this.handleCloseAnnotationCard}
+          />
+        ) : null}
+        <Map
+          style="mapbox://styles/mapbox/streets-v10"
+          containerStyle={{
+            height: "100vh",
+            width: "100vw"
+          }}
+          zoom={[11]}
+          center={[-95.3884096, 29.7640512]}
+        >
+          <DrawControl
+            displayControlsDefault={false}
+            controls={{ polygon: true, trash: true }}
+            onDrawCreate={this.onDrawCreate}
+            onDrawSelectionChange={this.onDrawSelectionChange}
+          />
+        </Map>
+      </div>
+    );
+  }
+}
 export default App;
