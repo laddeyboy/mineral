@@ -6,6 +6,7 @@ import { GeoJSON, Feature } from "geojson";
 
 import { mbToken } from "./util/constants";
 import AnnotationCard from "./containers/AnnotationCard";
+import { deepCopy } from "./util/helpers";
 
 const Map = ReactMapboxGL({ accessToken: mbToken });
 
@@ -24,7 +25,9 @@ const App: React.FC = () => {
     const { id } = features[0];
     const [newFeature] = features;
     newFeature.properties["nickName"] = `Feature ${id.slice(-4)}`;
-    newFeature.properties["notes"] = ["a test", "a second test"];
+    newFeature.properties["notes"] = [];
+    const temp = deepCopy(featuresArray);
+    console.log("TEMP", temp);
     setFeatures(featuresArray => [...featuresArray, newFeature]);
     setActiveFeatureID(id);
     toggleShowCard(true);
@@ -39,6 +42,16 @@ const App: React.FC = () => {
   };
 
   const handleCloseAnnotationCard = (notes: Array<string>) => {
+    //find id in featuresArray
+    const featureArrayCopy = [...featuresArray];
+    featuresArray.map(feat => {
+      console.log("active id", activeFeatureID);
+      if (feat.properties && feat.id === activeFeatureID) {
+        feat.properties.notes = notes;
+      }
+    });
+    console.log(featureArrayCopy);
+    setFeatures(featureArrayCopy);
     setCardNotes(notes);
     toggleShowCard(false);
   };

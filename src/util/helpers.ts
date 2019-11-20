@@ -21,3 +21,8 @@ export const getBroswerLocation = () => {
   );
   console.log("getLocation", typeof getLocation);
 };
+
+export const deepCopy = (arr: Array<Feature>) => {
+  console.log("calling deep copy", arr);
+  return arr.map(geoObj => JSON.parse(JSON.stringify(geoObj)));
+};
