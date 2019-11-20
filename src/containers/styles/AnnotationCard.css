@@ -1,0 +1,73 @@
+.annotation-card-container {
+  width: 200px;
+  height: 400px;
+  display: flex;
+  flex-direction: column;
+  background-color: lightgray;
+  position: absolute;
+  right: 2vw;
+  top: 2vh;
+  z-index: 999;
+  border: 2px solid black;
+}
+.annotation-card-heading {
+  display: flex;
+  justify-content: center;
+}
+.annotation-card-title {
+  padding: 2%;
+  font-size: 1.3rem;
+  display: flex;
+  font-weight: bold;
+  width: 90%;
+  justify-content: center;
+}
+
+.annotation-card-close {
+  padding: 2%;
+  font-size: 1.3rem;
+  font-weight: bold;
+  width: 10%;
+  transform: rotate(45deg);
+  cursor: pointer;
+}
+
+.annotation-card-info {
+  flex-grow: 2;
+  padding: 2%;
+  border: 2px solid darkgray;
+}
+.annotation-card-data-title {
+  width: 100%;
+  padding: 2%;
+  font-weight: bold;
+}
+
+.annotation-card-data {
+  width: 100%;
+  height: 50%;
+  flex-grow: 2;
+}
+.annotation-card-data ul {
+  margin-top: 0;
+  list-style: none;
+  padding-left: 2%;
+}
+
+.annotation-card-input {
+  width: 95%;
+  padding: 2%;
+}
+
+.annotation-card-btns {
+  padding: 2%;
+}
+
+.annotation-card-btns button {
+  background-color: #09a3ec;
+  color: white;
+  width: 50%;
+  height: 1.5rem;
+  font-size: 1rem;
+  border-radius: 5px;
+}

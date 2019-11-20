@@ -1,0 +1,17 @@
+{
+  "id": "fcbd4f085c4bc06dfb17236aca85dcef",
+  "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+      [-95.50325106118179, 29.855504796254564],
+      [-95.44351290200231, 29.88468083351347],
+      [-95.44866274331049, 29.826915917369718],
+      [-95.50325106118179, 29.855504796254564]
+    ]
+  },
+  "type": "Feature",
+  "properties": {
+    "nickName": "Test Data",
+    "notes": ["a test", "a second test", "a third test"]
+  }
+}
