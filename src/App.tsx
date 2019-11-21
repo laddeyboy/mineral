@@ -3,10 +3,15 @@ import ReactMapboxGL from "react-mapbox-gl";
 import DrawControl from "react-mapbox-gl-draw";
 import "@mapbox/mapbox-gl-draw/dist/mapbox-gl-draw.css";
 import { Feature } from "geojson";
+import "./App.css";
 
 import { mbToken } from "./util/constants";
 import AnnotationCard from "./containers/AnnotationCard";
-import { deepCopy } from "./util/helpers";
+import {
+  deepCopy,
+  getFeatureNotesByID,
+  deleteFeatureFromFeaturesArray
+} from "./util/helpers";
 
 const Map = ReactMapboxGL({ accessToken: mbToken });
 
@@ -18,7 +23,7 @@ interface StateProps {
 }
 
 class App extends React.Component<{}, StateProps> {
-  constructor(props: any) {
+  constructor(props: {}) {
     super(props);
     this.state = {
       showCard: false,
@@ -27,6 +32,11 @@ class App extends React.Component<{}, StateProps> {
       activeFeatureID: ""
     };
   }
+  // componentDidUpdate(PrevState: StateProps) {
+  //   if (PrevState.featuresArray !== this.state.featuresArray) {
+  //     console.log("checking features", this.state.featuresArray);
+  //   }
+  // }
 
   addCustomPropertiesToFeature = (feat: Feature): Feature => {
     const newFeature = { ...feat };
@@ -39,27 +49,31 @@ class App extends React.Component<{}, StateProps> {
 
   onDrawCreate = ({ features }: any) => {
     const newFeature = this.addCustomPropertiesToFeature(features[0]);
-    console.log(newFeature, newFeature.id);
     const newFeaturesArray = deepCopy(this.state.featuresArray);
     newFeaturesArray.push(newFeature);
-    this.setState({ featuresArray: newFeaturesArray });
-    this.setState({ activeFeatureID: newFeature.id as string });
-    this.setState({ showCard: true });
-  };
-
-  getFeatureNotesByID = (id: string) => {
-    const { featuresArray } = this.state;
-    return featuresArray
-      .filter(item => item.id === id)
-      .map(feat => feat.properties && feat.properties.notes)[0];
+    this.setState({
+      featuresArray: newFeaturesArray,
+      activeFeatureID: newFeature.id as string,
+      showCard: true
+    });
   };
 
   onDrawSelectionChange = ({ features }: any) => {
-    this.setState({ showCard: true });
     if (features.length > 0) {
+      this.setState({ showCard: true });
       const { id } = features[0];
       this.setState({ activeFeatureID: id });
     }
+  };
+
+  onDrawDelete = ({ features }: any) => {
+    console.log("deleting the feature");
+    const { featuresArray } = this.state;
+    const updatedFeatures = deleteFeatureFromFeaturesArray(
+      features[0].id,
+      featuresArray
+    );
+    this.setState({ featuresArray: updatedFeatures, showCard: false });
   };
 
   updateNotes = (note: string) => {
@@ -73,8 +87,12 @@ class App extends React.Component<{}, StateProps> {
     this.setState({ featuresArray: updatedFeatures });
   };
 
-  handleCloseAnnotationCard = () => {
-    this.setState({ showCard: false });
+  loadGeoJSONData = () => {
+    console.log("open file and draw shapes");
+  };
+
+  saveGeoJSONData = () => {
+    console.log("open file and save shapes");
   };
 
   render() {
@@ -84,9 +102,12 @@ class App extends React.Component<{}, StateProps> {
         {showCard ? (
           <AnnotationCard
             title={"Title"}
-            notes={this.getFeatureNotesByID(activeFeatureID)}
+            notes={getFeatureNotesByID(
+              activeFeatureID,
+              this.state.featuresArray
+            )}
             updateNotes={this.updateNotes}
-            closeAnnotationCard={this.handleCloseAnnotationCard}
+            closeAnnotationCard={() => this.setState({ showCard: false })}
           />
         ) : null}
         <Map
@@ -103,8 +124,25 @@ class App extends React.Component<{}, StateProps> {
             controls={{ polygon: true, trash: true }}
             onDrawCreate={this.onDrawCreate}
             onDrawSelectionChange={this.onDrawSelectionChange}
+            onDrawDelete={this.onDrawDelete}
           />
         </Map>
+        <div style={{ display: "flex", justifyContent: "center" }}>
+          <button
+            type="button"
+            className="import-btn"
+            onClick={this.loadGeoJSONData}
+          >
+            Load GeoJSON
+          </button>
+          <button
+            type="button"
+            className="export-btn"
+            onClick={this.saveGeoJSONData}
+          >
+            Save GeoJSON
+          </button>
+        </div>
       </div>
     );
   }

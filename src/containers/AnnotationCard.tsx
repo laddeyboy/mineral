@@ -13,13 +13,15 @@ const AnnotationCard: React.FC<PassedProps> = props => {
 
   const createNoteList = () => {
     const { notes } = props;
-    return notes.map((note, index) => {
-      return (
-        <li style={{ fontSize: ".75rem" }} key={index}>
-          {note}
-        </li>
-      );
-    });
+    if (notes) {
+      return notes.map((note, index) => {
+        return (
+          <li style={{ fontSize: ".75rem" }} key={index}>
+            {note}
+          </li>
+        );
+      });
+    }
   };
 
   const updateTextArea = (evt: any) => {

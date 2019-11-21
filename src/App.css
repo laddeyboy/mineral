@@ -20,3 +20,32 @@
 .App-link {
   color: #09d3ac;
 }
+
+.import-btn {
+  background-color: green;
+  color: white;
+  width: 100px;
+  height: 50px;
+  position: absolute;
+  left: 100px;
+  bottom: 50px;
+  border-radius: 5px;
+  font-weight: bold;
+  font-size: 1rem;
+  cursor: pointer;
+}
+
+.export-btn {
+  background-color: crimson;
+  color: white;
+  width: 100px;
+  height: 50px;
+  position: absolute;
+  left: 200px;
+  bottom: 50px;
+  border-radius: 5px;
+  font-weight: bold;
+  font-size: 1rem;
+  cursor: pointer;
+  margin-left: 10px;
+}
