@@ -24,7 +24,7 @@ const AnnotationCard: React.FC<PassedProps> = props => {
     }
   };
 
-  const updateTextArea = (evt: any) => {
+  const updateTextArea = (evt: React.ChangeEvent<HTMLTextAreaElement>) => {
     setTextAreaValue(evt.target.value);
   };
   const clearTextArea = () => {
@@ -35,7 +35,7 @@ const AnnotationCard: React.FC<PassedProps> = props => {
     closeAnnotationCard();
   };
 
-  const handleSubmit = (evt: any) => {
+  const handleSubmit = (evt: React.MouseEvent<HTMLButtonElement>) => {
     evt.preventDefault();
     const { updateNotes } = props;
     updateNotes(textAreaValue);

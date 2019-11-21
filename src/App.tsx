@@ -2,7 +2,7 @@ import React from "react";
 import ReactMapboxGL from "react-mapbox-gl";
 import DrawControl from "react-mapbox-gl-draw";
 import "@mapbox/mapbox-gl-draw/dist/mapbox-gl-draw.css";
-import { Feature } from "geojson";
+import { Feature, FeatureCollection } from "geojson";
 import "./App.css";
 
 import { mbToken } from "./util/constants";
@@ -18,7 +18,7 @@ const Map = ReactMapboxGL({ accessToken: mbToken });
 interface StateProps {
   showCard: boolean;
   cardNotes: Array<string>;
-  featuresArray: Array<any>;
+  featuresArray: Array<Feature>;
   activeFeatureID: string;
 }
 
@@ -47,7 +47,7 @@ class App extends React.Component<{}, StateProps> {
     return newFeature;
   };
 
-  onDrawCreate = ({ features }: any) => {
+  onDrawCreate = ({ features }: FeatureCollection) => {
     const newFeature = this.addCustomPropertiesToFeature(features[0]);
     const newFeaturesArray = deepCopy(this.state.featuresArray);
     newFeaturesArray.push(newFeature);
@@ -58,19 +58,19 @@ class App extends React.Component<{}, StateProps> {
     });
   };
 
-  onDrawSelectionChange = ({ features }: any) => {
+  onDrawSelectionChange = ({ features }: FeatureCollection) => {
     if (features.length > 0) {
       this.setState({ showCard: true });
       const { id } = features[0];
-      this.setState({ activeFeatureID: id });
+      this.setState({ activeFeatureID: id as string });
     }
   };
 
-  onDrawDelete = ({ features }: any) => {
+  onDrawDelete = ({ features }: FeatureCollection) => {
     console.log("deleting the feature");
     const { featuresArray } = this.state;
     const updatedFeatures = deleteFeatureFromFeaturesArray(
-      features[0].id,
+      features[0].id as string,
       featuresArray
     );
     this.setState({ featuresArray: updatedFeatures, showCard: false });
