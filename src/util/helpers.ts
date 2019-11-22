@@ -13,6 +13,15 @@ export const getFeatureNotesByID = (
     .map(feat => feat.properties && feat.properties.notes)[0];
 };
 
+export const getFeatureNameByID = (
+  id: string,
+  featuresArray: Array<Feature>
+) => {
+  return featuresArray
+    .filter(feature => feature.id === id)
+    .map(feat => feat.properties && feat.properties.nickName)[0];
+};
+
 export const deleteFeatureFromFeaturesArray = (
   id: string,
   featuresArray: Array<Feature>

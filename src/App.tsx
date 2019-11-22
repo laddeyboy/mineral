@@ -10,6 +10,7 @@ import AnnotationCard from "./containers/AnnotationCard";
 import {
   deepCopy,
   getFeatureNotesByID,
+  getFeatureNameByID,
   deleteFeatureFromFeaturesArray
 } from "./util/helpers";
 
@@ -39,9 +40,10 @@ class App extends React.Component<{}, StateProps> {
   // }
 
   addCustomPropertiesToFeature = (feat: Feature): Feature => {
+    const lengthID = this.state.featuresArray.length;
     const newFeature = { ...feat };
     if (newFeature.properties) {
-      newFeature.properties["nickName"] = `Feature`;
+      newFeature.properties["nickName"] = `Feature ${lengthID + 1}`;
       newFeature.properties["notes"] = [];
     }
     return newFeature;
@@ -87,25 +89,22 @@ class App extends React.Component<{}, StateProps> {
     this.setState({ featuresArray: updatedFeatures });
   };
 
-  loadGeoJSONData = () => {
-    console.log("open file and draw shapes");
-  };
+  // loadGeoJSONData = () => {
+  //   console.log("open file and draw shapes");
+  // };
 
-  saveGeoJSONData = () => {
-    console.log("open file and save shapes");
-  };
+  // saveGeoJSONData = () => {
+  //   console.log("open file and save shapes");
+  // };
 
   render() {
-    const { showCard, activeFeatureID } = this.state;
+    const { showCard, activeFeatureID, featuresArray } = this.state;
     return (
       <div>
         {showCard ? (
           <AnnotationCard
-            title={"Title"}
-            notes={getFeatureNotesByID(
-              activeFeatureID,
-              this.state.featuresArray
-            )}
+            title={getFeatureNameByID(activeFeatureID, featuresArray)}
+            notes={getFeatureNotesByID(activeFeatureID, featuresArray)}
             updateNotes={this.updateNotes}
             closeAnnotationCard={() => this.setState({ showCard: false })}
           />
@@ -127,7 +126,7 @@ class App extends React.Component<{}, StateProps> {
             onDrawDelete={this.onDrawDelete}
           />
         </Map>
-        <div style={{ display: "flex", justifyContent: "center" }}>
+        {/* <div style={{ display: "flex", justifyContent: "center" }}>
           <button
             type="button"
             className="import-btn"
@@ -142,7 +141,7 @@ class App extends React.Component<{}, StateProps> {
           >
             Save GeoJSON
           </button>
-        </div>
+        </div> */}
       </div>
     );
   }
